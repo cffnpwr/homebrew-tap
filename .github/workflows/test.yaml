@@ -1,0 +1,65 @@
+name: Test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  syntax:
+    name: Tap syntax
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/homebrew/brew:main # zizmor: ignore[unpinned-images]
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@18fcb8e3e06b4247c676c506750dc95ea7226479 # 2026.07.13.1
+
+      - name: Check formula style
+        run: brew style cffnpwr/tap
+
+      - name: Audit formulae
+        run: brew audit --online --strict --except=installed --tap=cffnpwr/tap
+
+  install:
+    name: Install (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS arm64
+            runner: macos-15
+          - name: Linux x86_64
+            runner: ubuntu-24.04
+            container: ghcr.io/homebrew/brew:main
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
+            container: ghcr.io/homebrew/brew:main
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.container }} # zizmor: ignore[unpinned-images]
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@18fcb8e3e06b4247c676c506750dc95ea7226479 # 2026.07.13.1
+
+      - name: Install formula
+        run: brew install --formula --verbose cffnpwr/tap/dollar-cmd
+
+      - name: Check linkage
+        run: brew linkage --test cffnpwr/tap/dollar-cmd
+
+      - name: Run formula test
+        run: brew test --verbose cffnpwr/tap/dollar-cmd
