@@ -18,7 +18,7 @@ jobs:
     name: Tap syntax
     runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/homebrew/brew:main # zizmor: ignore[unpinned-images]
+      image: ghcr.io/homebrew/brew:main@sha256:33b88a61f5ec5a4d8ad8587146e934112b2ffdd6cbeb9d2f4d03dff55bb7ffd3
     timeout-minutes: 15
     permissions:
       contents: read
@@ -29,25 +29,53 @@ jobs:
       - name: Check formula style
         run: brew style cffnpwr/tap
 
+      - name: Read all formulae
+        run: brew readall --aliases --os=all --arch=all cffnpwr/tap
+
       - name: Audit formulae
         run: brew audit --online --strict --except=installed --tap=cffnpwr/tap
 
+  formulae:
+    name: List formulae
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      names: ${{ steps.list.outputs.names }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Collect formula names
+        id: list
+        run: |-
+          set -eu
+          names=$(find Formula -name '*.rb' -exec basename {} .rb \; | sort | jq -Rsc 'split("\n") | map(select(length > 0))')
+          echo "names=$names" >> "$GITHUB_OUTPUT"
+
   install:
-    name: Install (${{ matrix.name }})
+    name: Install ${{ matrix.formula }} (${{ matrix.platform.name }})
+    needs: formulae
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: macOS arm64
+        formula: ${{ fromJson(needs.formulae.outputs.names) }}
+        platform:
+          - name: macOS 26 arm64
+            runner: macos-26
+          - name: macOS 15 arm64
             runner: macos-15
           - name: Linux x86_64
             runner: ubuntu-24.04
-            container: ghcr.io/homebrew/brew:main
+            container: ghcr.io/homebrew/brew:main@sha256:33b88a61f5ec5a4d8ad8587146e934112b2ffdd6cbeb9d2f4d03dff55bb7ffd3
           - name: Linux arm64
             runner: ubuntu-24.04-arm
-            container: ghcr.io/homebrew/brew:main
-    runs-on: ${{ matrix.runner }}
-    container: ${{ matrix.container }} # zizmor: ignore[unpinned-images]
+            container: ghcr.io/homebrew/brew:main@sha256:33b88a61f5ec5a4d8ad8587146e934112b2ffdd6cbeb9d2f4d03dff55bb7ffd3
+    runs-on: ${{ matrix.platform.runner }}
+    container: ${{ matrix.platform.container }}
     timeout-minutes: 30
     permissions:
       contents: read
@@ -55,11 +83,39 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@18fcb8e3e06b4247c676c506750dc95ea7226479 # 2026.07.13.1
 
-      - name: Install formula
-        run: brew install --formula --verbose cffnpwr/tap/dollar-cmd
+      - name: Install and test formula
+        env:
+          FORMULA_NAME: ${{ matrix.formula }}
+        run: |-
+          set -eu
+          formula="cffnpwr/tap/$FORMULA_NAME"
+          brew install --formula --verbose "$formula"
+          brew linkage --test "$formula"
+          brew test --verbose "$formula"
 
-      - name: Check linkage
-        run: brew linkage --test cffnpwr/tap/dollar-cmd
+  source-build:
+    name: Build ${{ matrix.formula }} from source
+    needs: formulae
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/homebrew/brew:main@sha256:33b88a61f5ec5a4d8ad8587146e934112b2ffdd6cbeb9d2f4d03dff55bb7ffd3
+    strategy:
+      fail-fast: false
+      matrix:
+        formula: ${{ fromJson(needs.formulae.outputs.names) }}
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@18fcb8e3e06b4247c676c506750dc95ea7226479 # 2026.07.13.1
 
-      - name: Run formula test
-        run: brew test --verbose cffnpwr/tap/dollar-cmd
+      - name: Build formula from source and test
+        env:
+          FORMULA_NAME: ${{ matrix.formula }}
+        run: |-
+          set -eu
+          formula="cffnpwr/tap/$FORMULA_NAME"
+          brew install --formula --build-from-source --verbose "$formula"
+          brew linkage --test "$formula"
+          brew test --verbose "$formula"
