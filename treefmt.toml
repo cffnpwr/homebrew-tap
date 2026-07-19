@@ -1,0 +1,6 @@
+[global]
+excludes = [".git/**", ".jj/**", ".tmp/**"]
+
+[formatter.yamlfmt]
+command = "yamlfmt"
+includes = ["*.yaml", "*.yml"]
