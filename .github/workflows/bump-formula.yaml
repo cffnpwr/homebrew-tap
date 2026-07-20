@@ -73,7 +73,7 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: |-
           set -eu
-          current=$(brew ruby -e 'puts Formulary.factory(ENV.fetch("FORMULA")).version')
+          current=$(brew info --json=v2 --formula "$FORMULA" | jq -r '.formulae[0].versions.stable')
           if [ "$current" = "$VERSION" ]; then
             echo "$FORMULA is already at $VERSION, keeping url and sha256 as is"
             exit 0
