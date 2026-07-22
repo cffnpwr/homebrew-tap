@@ -18,7 +18,7 @@ jobs:
     name: Tap syntax
     runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/homebrew/brew:main@sha256:0db9e2837f21ede11f2d14ee1071a44b204d1c4741ce9f30aaf4ac9410a7432f
+      image: ghcr.io/homebrew/brew:main@sha256:2846726e34b9cc6833c2444166da4e0775756d688ef68c845ced9c84876ae973
     timeout-minutes: 15
     permissions:
       contents: read
@@ -70,10 +70,10 @@ jobs:
             runner: macos-15
           - name: Linux x86_64
             runner: ubuntu-24.04
-            container: ghcr.io/homebrew/brew:main@sha256:0db9e2837f21ede11f2d14ee1071a44b204d1c4741ce9f30aaf4ac9410a7432f
+            container: ghcr.io/homebrew/brew:main@sha256:2846726e34b9cc6833c2444166da4e0775756d688ef68c845ced9c84876ae973
           - name: Linux arm64
             runner: ubuntu-24.04-arm
-            container: ghcr.io/homebrew/brew:main@sha256:0db9e2837f21ede11f2d14ee1071a44b204d1c4741ce9f30aaf4ac9410a7432f
+            container: ghcr.io/homebrew/brew:main@sha256:2846726e34b9cc6833c2444166da4e0775756d688ef68c845ced9c84876ae973
     runs-on: ${{ matrix.platform.runner }}
     container: ${{ matrix.platform.container }}
     timeout-minutes: 30
@@ -98,7 +98,7 @@ jobs:
     needs: formulae
     runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/homebrew/brew:main@sha256:0db9e2837f21ede11f2d14ee1071a44b204d1c4741ce9f30aaf4ac9410a7432f
+      image: ghcr.io/homebrew/brew:main@sha256:2846726e34b9cc6833c2444166da4e0775756d688ef68c845ced9c84876ae973
     strategy:
       fail-fast: false
       matrix:
