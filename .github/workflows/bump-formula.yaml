@@ -111,10 +111,10 @@ jobs:
             runner: macos-15
           - name: Linux x86_64
             runner: ubuntu-24.04
-            container: ghcr.io/homebrew/brew:main@sha256:5caee7696078bc3ca8df237e16d219135832295c0152bfe56c84bf9762f9d780
+            container: ghcr.io/homebrew/brew:main@sha256:664c0a619197c0cfb90dc73537f8cdb87441e1a09c37810951d37c5c8ad52961
           - name: Linux arm64
             runner: ubuntu-24.04-arm
-            container: ghcr.io/homebrew/brew:main@sha256:5caee7696078bc3ca8df237e16d219135832295c0152bfe56c84bf9762f9d780
+            container: ghcr.io/homebrew/brew:main@sha256:664c0a619197c0cfb90dc73537f8cdb87441e1a09c37810951d37c5c8ad52961
     runs-on: ${{ matrix.runner }}
     container: ${{ matrix.container }}
     timeout-minutes: 60
