@@ -10,6 +10,14 @@ class DollarCmd < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://ghcr.io/v2/cffnpwr/tap"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ba6df327904213fbc5fcd740708d7dc28af507439b861e02d1463a8adacba381"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "17a26b2865b2657b6c47e1b529f833c6f341ef81518e5f995c5e5ed41cf91b91"
+    sha256 cellar: :any,                 arm64_linux:   "67d877f4bd211b85074a81cb30048878463f57b60c0eb1397139bfde63964728"
+    sha256 cellar: :any,                 x86_64_linux:  "6fd5b6b592ab41fe203577ae4df64998d7f90d495f79acb7fdeea12e9d13ed0c"
+  end
+
   depends_on "rust" => :build
 
   def install
