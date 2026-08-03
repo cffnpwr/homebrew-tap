@@ -1,8 +1,8 @@
 class DollarCmd < Formula
   desc "Joke command that makes a pasted `$ cmd args` line just work"
   homepage "https://github.com/cffnpwr/dollar-cmd"
-  url "https://github.com/cffnpwr/dollar-cmd/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "dd3a43c6134217270a098c19be0fe377466069bd857089af1ec62a4b797e8a78"
+  url "https://github.com/cffnpwr/dollar-cmd/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "6e5accef006fba81a51eb7fb8de28f45131ca137f5c383c009d6c8f1957c8ab4"
   license "MIT"
 
   livecheck do
