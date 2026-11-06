@@ -16,7 +16,7 @@ permissions: {}
 jobs:
   syntax:
     name: Tap syntax
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     container:
       image: ghcr.io/homebrew/brew:main@sha256:664c0a619197c0cfb90dc73537f8cdb87441e1a09c37810951d37c5c8ad52961
     timeout-minutes: 15
@@ -37,7 +37,7 @@ jobs:
 
   formulae:
     name: List formulae
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
       contents: read
@@ -96,7 +96,7 @@ jobs:
   source-build:
     name: Build ${{ matrix.formula }} from source
     needs: formulae
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     container:
       image: ghcr.io/homebrew/brew:main@sha256:664c0a619197c0cfb90dc73537f8cdb87441e1a09c37810951d37c5c8ad52961
     strategy:
